@@ -22,15 +22,15 @@ public class SentimentController {
 
 	@PostMapping(value = "/sentiment", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 //	@ResponseBody
-	public RedirectView handleSentimentRequest(@ModelAttribute SentimentRequest request, RedirectAttributes redirectAttributes) {
+	public RedirectView handleSentimentRequest(@ModelAttribute SentimentRequest request, RedirectAttributes redirectAttributes, Model model) {
 		System.out.println(request);
 
 		// Call the service to get the sentiment analysis result
 		String sentiment = "sad";
 
 		// Add the sentimentRequest and sentiment attributes to the model
-//		model.addAttribute("sentimentRequest", request);
-//		model.addAttribute("sentiment", sentiment);
+		model.addAttribute("sentimentRequest", request);
+		model.addAttribute("sentiment", sentiment);
 		redirectAttributes.addFlashAttribute("sentimentRequest", request);
 		redirectAttributes.addFlashAttribute("sentiment", sentiment);
 		// Return the name of the view
@@ -38,7 +38,8 @@ public class SentimentController {
 	}
 
 	@GetMapping("/showResult")
-	public String showResult(Model model) {
+	public String showResult(@ModelAttribute("sentimentRequest") SentimentRequest sentimentRequest,
+							 @ModelAttribute("sentiment") String sentiment, Model model) {
 		model.addAttribute("sentimentRequest", new SentimentRequest());
 		model.addAttribute("sentiment", "sad");
 		return "result";

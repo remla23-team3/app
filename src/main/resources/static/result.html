@@ -7,6 +7,12 @@
 <body>
 <h1>Result</h1>
 <p>Review: <span th:text="${sentimentRequest.review}"></span></p>
+<p>Sentiment: <span th:text="${model.sentiment}"></span></p>
 <p>Sentiment: <span th:text="${sentiment}"></span></p>
+
+<td th:text="2">1</td>
+<p>Sentiment: <span th:text="${model.sentiment}" th:if="${sentiment} != null" th:utext="${sentiment}" /></p>
+<h1 th:text="${sentiment}"></h1>
+
 </body>
 </html>
