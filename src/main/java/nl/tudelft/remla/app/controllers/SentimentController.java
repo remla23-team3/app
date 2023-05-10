@@ -45,6 +45,13 @@ public class SentimentController {
 		return "result";
 	}
 
+	/**
+	 * This method sends the review to the model-service, and returns a double indicating the
+	 * sentiment of the review.
+	 * @param sentReq the original sentiment request
+	 * @return double containing the sentiment
+	 * @throws IOException in case of problems sending the HTTP requests to model-service
+	 */
 	public double sendSentimentRequest(SentimentRequest sentReq) throws IOException {
 		URL url;
 		try {
