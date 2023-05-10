@@ -11,7 +11,7 @@
         <h1>Review Form</h1>
         <form action="#" th:action="@{/sentiment}" th:object="${sentiment}" method="post">
             <label>Sentiment:</label>
-            <input type="text" th:field="*{test}" placeholder="Sentiment">
+            <input type="text" th:field="*{sentiment}" placeholder="Sentiment">
             <button type="submit">Submit</button>
         </form>
     </div>
