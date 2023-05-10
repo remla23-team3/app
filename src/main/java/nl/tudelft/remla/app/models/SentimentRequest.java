@@ -1,13 +1,13 @@
 package nl.tudelft.remla.app.models;
 
 public class SentimentRequest {
-	private String review;
+	private String test;
 
-	public void setReview(String review) {
-		this.review = review;
+	public String getTest() {
+		return test;
 	}
 
-	public String getReview() {
-		return this.review;
+	public void setTest(String test) {
+		this.test = test;
 	}
 }
