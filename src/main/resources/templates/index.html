@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="ISO-8859-1">
+    <title>Review</title>
+</head>
+
+<body>
+    <div align="center">
+        <h1>Review Form</h1>
+        <form action="#" th:action="@{/sentiment}" th:object="${sentiment}" method="post">
+            <label>Sentiment:</label>
+            <input type="text" th:field="*{sentiment}" placeholder="Sentiment">
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+</body>
+
+</html>
