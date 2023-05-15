@@ -29,6 +29,8 @@ public class SentimentController {
 	private String modelServiceUrl;
 
 	private Integer requestsCounter = 0; // number of successfully made requests
+	private Integer requestsPositive = 0; // number of successfully made requests
+	private Integer requestsNegative = 0; // number of successfully made requests
 
 	@GetMapping("/")
 	public String showForm(Model model) {
@@ -45,13 +47,21 @@ public class SentimentController {
 
 		Random rand = new Random();
 		int random = rand.nextInt(25);
+		StringBuilder metrics = new StringBuilder();
+		metrics.append("# HELP my_app_random This is just a random 'gauge' for illustration.\n");
+		metrics.append("# TYPE my_app_random gauge\n");
+		metrics.append("my_app_random ").append(random).append("\n\n");
 
-		String numRequestMetric = "# HELP my_app_random This is just a random 'gauge' for illustration.\n"
-		 + "# TYPE my_app_random gauge\n" +
-			"my_app_random " +random+"\n\n" + "# HELP num_sentiment_requests The number of requests that have been served, by page.\n"
-		+ "# TYPE num_sentiment_requests counter\n" + "num_sentiment_requests{method=\"post\",code=\"200\"} " + requestsCounter+"\n";
+		metrics.append("# HELP num_sentiment_total_requests The number of all requests that have been made.\n");
+		metrics.append("# TYPE num_sentiment_total_requests counter\n");
+		metrics.append("num_sentiment_total_requests{method=\"post\",code=\"200\"} ").append(requestsCounter).append("\n\n");
 
-		return new ResponseEntity<>(numRequestMetric, httpHeaders, HttpStatus.OK);
+		metrics.append("# HELP num_sentiment_requests_per_type The number of positive sentiments that have been made.\n");
+		metrics.append("# TYPE num_sentiment_requests_per_type counter\n");
+		metrics.append("num_sentiment_requests_per_type{type=\"positive\"} ").append(requestsPositive).append("\n");
+		metrics.append("num_sentiment_requests_per_type{type=\"negative\"} ").append(requestsNegative).append("\n");
+
+		return new ResponseEntity<>(metrics.toString(), httpHeaders, HttpStatus.OK);
 	}
 
 	@PostMapping("/sentiment")
@@ -61,8 +71,10 @@ public class SentimentController {
 
 		if (sentiment < 0.5) {
 			sentReq.setSentiment("):");
+			requestsNegative++;
 		} else {
 			sentReq.setSentiment("(:");
+			requestsPositive++;
 		}
 
 		return "result";
