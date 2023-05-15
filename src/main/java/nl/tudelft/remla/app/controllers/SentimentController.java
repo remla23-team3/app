@@ -46,8 +46,8 @@ public class SentimentController {
 		Random rand = new Random();
 		int random = rand.nextInt(25);
 
-		String numRequestMetric = "# HELP my_app_random This is just a random 'gauge' for illustration. \n"
-		 + "# TYPE my_app_random gauge \n" +
+		String numRequestMetric = "# HELP my_app_random This is just a random 'gauge' for illustration.\n"
+		 + "# TYPE my_app_random gauge\n" +
 			"my_app_random " +random+"\n\n" + "# HELP num_sentiment_requests The number of requests that have been served, by page.\n"
 		+ "# TYPE num_sentiment_requests counter\n" + "num_sentiment_requests{method=\"post\",code=\"200\"} " + requestsCounter+"\n";
 
