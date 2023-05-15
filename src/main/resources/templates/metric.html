@@ -7,10 +7,9 @@
 </head>
 
 <body>
-<div align="center">
-    <h1>Metrics</h1>
-<!--    TODO: add the different metric UI -->
-</div>
+<p># HELP num_sentiment_requests The number of requests that have been served, by page.
+<br> # TYPE num_sentiment_requests counter <br>
+num_sentiment_requests{method="post",code="200"} 5 </p>
 </body>
 
 </html>
