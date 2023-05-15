@@ -1,0 +1,43 @@
+name: Release
+# only trigger on tags, `verify` has already been triggered by push to PR
+on:
+  push:
+    tags: ["v[0-9]+.[0-9]+.[0-9]+"]
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: Parse version info from tag
+        run: |
+          # GITHUB_REF is like refs/tags/v2.3.5, so strip the first 11 chars
+          VERSION=${GITHUB_REF#refs/tags/}
+          MAJOR=`echo "$VERSION" | cut -d . -f 1`
+          MINOR=`echo "$VERSION" | cut -d . -f 2`
+          PATCH=`echo "$VERSION" | cut -d . -f 3`
+          echo "version=$VERSION" >> $GITHUB_ENV
+          echo "version_major=$MAJOR" >> $GITHUB_ENV
+          echo "version_minor=$MINOR" >> $GITHUB_ENV
+          echo "version_patch=$PATCH" >> $GITHUB_ENV
+      - name: Registry Login (ghcr.io)
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+#      - name: Print contents of .env file 1
+#        run: cat .env
+      - name: Set release version variable
+        run: echo "RELEASE_VERSION=$(git describe --tags)" >> $GITHUB_ENV
+#      - name: Update version in .env file
+#        run: sed -i "s/^CURRENT_VERSION=.*/CURRENT_VERSION=$RELEASE_VERSION/g" .env
+#      - name: Print contents of .env file 2
+#        run: cat .env
+      - name: Update version in pom.xml
+        run: mvn -B versions:set -DnewVersion=$RELEASE_VERSION -DgenerateBackupPoms=false
+      - name: Build and Push Docker Image
+        run: |
+          IMG=ghcr.io/${{ github.repository }}
+          docker build \
+            --tag $IMG:${{ env.version }} \
+            --tag $IMG:${{ env.version_major }}.${{ env.version_minor }}.latest \
+            --tag $IMG:${{ env.version_major }}.latest \
+            --tag $IMG:latest \
+            .
+          docker push --all-tags $IMG
