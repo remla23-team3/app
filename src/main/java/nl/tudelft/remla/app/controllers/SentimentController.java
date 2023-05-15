@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import nl.tudelft.remla.app.models.SentimentRequest;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -33,8 +34,19 @@ public class SentimentController {
 	}
 
 	@GetMapping("/metric")
+	@ResponseBody
 	public String showMetric(Model model) {
-		return "metric";
+//		# HELP num_requests The number of requests that have been served, by page.
+//		# TYPE num_requests counter
+//		num_requests{page="index"} 4
+//		num_requests{page="sub"} 1
+// System.lineSeparator()
+
+		String numRequestMetric = "# HELP num_requests The number of requests that have been served, by page.\n";
+		numRequestMetric = numRequestMetric + "# TYPE num_requests counter\n";
+		numRequestMetric = numRequestMetric.concat(String.format("num_requests{method=\"post\",code=\"200\"} %d\n",5));
+
+		return numRequestMetric;
 	}
 
 	@PostMapping("/sentiment")
