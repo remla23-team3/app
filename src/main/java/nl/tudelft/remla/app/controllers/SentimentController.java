@@ -32,6 +32,11 @@ public class SentimentController {
 		return "index";
 	}
 
+	@GetMapping("/metric")
+	public String showMetric(Model model) {
+		return "metric";
+	}
+
 	@PostMapping("/sentiment")
 	public String submitSentimentForm(@ModelAttribute("sentiment") SentimentRequest sentReq) throws IOException {
 		double sentiment = sendSentimentRequest(sentReq);
