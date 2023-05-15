@@ -2,6 +2,10 @@ package nl.tudelft.remla.app.controllers;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,15 +37,21 @@ public class SentimentController {
 		return "index";
 	}
 
-	@GetMapping("/metrics")
-	public String showMetric(Model model) {
 
+	@GetMapping(value = "/metrics", produces = MediaType.TEXT_PLAIN_VALUE)
+	public ResponseEntity<String> showMetric(Model model) {
+		var httpHeaders = new HttpHeaders();
+		httpHeaders.setContentType(new MediaType("text", "plain", StandardCharsets.UTF_8));
 
 		Random rand = new Random();
 		int random = rand.nextInt(25);
-		model.addAttribute("random", random);
-		model.addAttribute("requests", requestsCounter);
-		return  "metric";
+
+		String numRequestMetric = "# HELP my_app_random This is just a random 'gauge' for illustration. \n"
+		 + "# TYPE my_app_random gauge \n" +
+			"my_app_random " +random+"\n\n" + "# HELP num_sentiment_requests The number of requests that have been served, by page.\n"
+		+ "# TYPE num_sentiment_requests counter\n" + "num_sentiment_requests{method=\"post\",code=\"200\"} " + requestsCounter+"\n";
+
+		return new ResponseEntity<>(numRequestMetric, httpHeaders, HttpStatus.OK);
 	}
 
 	@PostMapping("/sentiment")
