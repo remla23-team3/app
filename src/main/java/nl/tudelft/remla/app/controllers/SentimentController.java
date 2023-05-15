@@ -11,10 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import nl.tudelft.remla.app.models.SentimentRequest;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -33,7 +30,7 @@ public class SentimentController {
 		return "index";
 	}
 
-	@GetMapping("/metric")
+	@GetMapping("/metrics")
 	@ResponseBody
 	public String showMetric(Model model) {
 //		# HELP num_requests The number of requests that have been served, by page.
@@ -41,12 +38,13 @@ public class SentimentController {
 //		num_requests{page="index"} 4
 //		num_requests{page="sub"} 1
 // System.lineSeparator()
+		String newLine = System.getProperty("line.separator");
+		String numRequestMetric = "# HELP num_sentiment_requests The number of requests that have been served, by page.\n";
+		numRequestMetric = numRequestMetric + newLine + "# TYPE num_sentiment_requests counter\n";
+		numRequestMetric = numRequestMetric.concat(String.format("num_sentiment_requests{method=\"post\",code=\"200\"} %d\n",5));
+		
+		return  numRequestMetric;
 
-		String numRequestMetric = "# HELP num_requests The number of requests that have been served, by page.\n";
-		numRequestMetric = numRequestMetric + "# TYPE num_requests counter\n";
-		numRequestMetric = numRequestMetric.concat(String.format("num_requests{method=\"post\",code=\"200\"} %d\n",5));
-
-		return numRequestMetric;
 	}
 
 	@PostMapping("/sentiment")
