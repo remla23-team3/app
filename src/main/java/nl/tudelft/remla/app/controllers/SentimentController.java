@@ -16,12 +16,15 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Random;
 
 @Controller
 public class SentimentController {
 
 	@Value("${modelServiceUrl}")
 	private String modelServiceUrl;
+
+	private Integer requestsCounter = 0; // number of successfully made requests
 
 	@GetMapping("/")
 	public String showForm(Model model) {
@@ -32,22 +35,19 @@ public class SentimentController {
 
 	@GetMapping("/metrics")
 	public String showMetric(Model model) {
-//		# HELP num_requests The number of requests that have been served, by page.
-//		# TYPE num_requests counter
-//		num_requests{page="index"} 4
-//		num_requests{page="sub"} 1
-//      System.lineSeparator()
-//		String newLine = System.getProperty("line.separator");
-//		String numRequestMetric = "# HELP num_sentiment_requests The number of requests that have been served, by page.\n";
-//		numRequestMetric = numRequestMetric + newLine + "# TYPE num_sentiment_requests counter\n";
-//		numRequestMetric = numRequestMetric.concat(String.format("num_sentiment_requests{method=\"post\",code=\"200\"} %d\n",5));
 
+
+		Random rand = new Random();
+		int random = rand.nextInt(25);
+		model.addAttribute("random", random);
+		model.addAttribute("requests", requestsCounter);
 		return  "metric";
 	}
 
 	@PostMapping("/sentiment")
 	public String submitSentimentForm(@ModelAttribute("sentiment") SentimentRequest sentReq) throws IOException {
 		double sentiment = sendSentimentRequest(sentReq);
+		requestsCounter++;
 
 		if (sentiment < 0.5) {
 			sentReq.setSentiment("):");

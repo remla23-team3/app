@@ -7,9 +7,14 @@
 </head>
 
 <body>
+<p> # HELP my_app_random This is just a random 'gauge' for illustration. <br>
+# TYPE my_app_random gauge <br>
+my_app_random <span th:text="${random}"></span> </p>
+
+
 <p># HELP num_sentiment_requests The number of requests that have been served, by page.
 <br> # TYPE num_sentiment_requests counter <br>
-num_sentiment_requests{method="post",code="200"} 5 </p>
+num_sentiment_requests{method="post",code="200"} <span th:text="${requests}"></span> </p>
 </body>
 
 </html>
