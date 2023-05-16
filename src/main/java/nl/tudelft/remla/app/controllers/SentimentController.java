@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import nl.tudelft.remla.app.models.FeedbackRequest;
 import nl.tudelft.remla.app.models.SentimentRequest;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -28,15 +29,29 @@ public class SentimentController {
 	@Value("${modelServiceUrl}")
 	private String modelServiceUrl;
 
-	private Integer requestsCounter = 0; // number of successfully made requests
+	private Integer requestsCounter = 0;  // number of successfully made requests
 	private Integer requestsPositive = 0; // number of successfully made requests
 	private Integer requestsNegative = 0; // number of successfully made requests
+	private Integer sentimentFeedback = 0; // variable feedback value
+	private Integer negativeFeedback = 0; 	  // number of user negative feedback
+	private Integer positiveFeedback = 0;	  // number of user positive feedback
 
 	@GetMapping("/")
 	public String showForm(Model model) {
 		SentimentRequest sentReq = new SentimentRequest();
 		model.addAttribute("sentiment", sentReq);
+
 		return "index";
+	}
+
+
+	@GetMapping("/give-feedback")
+	public String showResult(Model model) {
+		FeedbackRequest feedbackRequest = new FeedbackRequest();
+		feedbackRequest.setFeedback(-1);
+		model.addAttribute("feedback", feedbackRequest);
+		
+		return "feedbackpage";
 	}
 
 
@@ -70,14 +85,49 @@ public class SentimentController {
 		requestsCounter++;
 
 		if (sentiment < 0.5) {
-			sentReq.setSentiment("):");
+			// Do something with the negative sentiment
+
+			// Do not overwrite sentReq with sentReq.setSentiment()
+			// because the "):" would be overwritten
+			sentReq.setReview("):");
 			requestsNegative++;
 		} else {
-			sentReq.setSentiment("(:");
+			// Do something with the positive sentiment
+
+			// Do not overwrite sentReq with sentReq.setSentiment()
+			// because the "(:" would be overwritten
+			sentReq.setReview("(:");
 			requestsPositive++;
 		}
 
-		return "result";
+		return "index";
+	}
+
+	@PostMapping("/feedback")
+	public String submitFeedback(@ModelAttribute("feedback") FeedbackRequest sentReq) throws IOException {
+		double feedback = sentReq.getFeedback();
+		requestsCounter++;
+
+		if (feedback < 50) {
+			// The user gives negative feedback when the prediction is bad
+			// Do not overwrite it with sentReq.setFeedback()
+			this.sentimentFeedback = sentReq.getFeedback();
+			this.negativeFeedback++;
+
+			System.out.println("Sentiment prediction feedback: " + this.sentimentFeedback);
+			System.out.println("Total # negative prediction feedback: " + this.negativeFeedback);
+
+		} else {
+			// The user gives positive feedback when the prediction is good
+			// Do not overwrite it with sentReq.setFeedback()
+			this.sentimentFeedback = sentReq.getFeedback();
+			this.positiveFeedback++;
+
+			System.out.println("Sentiment prediction feedback: " + this.sentimentFeedback);
+			System.out.println("Total # positive prediction feedback: " + this.positiveFeedback);
+		}
+
+		return "feedbackpage";
 	}
 
 	/**

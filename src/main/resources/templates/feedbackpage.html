@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="ISO-8859-1">
+    <title>Feedback</title>
+</head>
+
+<body>
+
+    <div align="center">
+        <h1>Sentiment feedback</h1>
+        <span>Provide a score between 1 and 100 to the resulted sentiment: </span>
+        <form action="#" th:action="@{/feedback}" th:object="${feedback}" method="post">
+            <label>Sentiment score:</label>
+            <input type="text" th:field="*{feedback}" placeholder="Feedback">
+            <button type="submit">Submit feedback</button>
+        </form>
+    </div>
+
+    <div align="center" th:if="${feedback.feedback != -1}">
+        <div align="center">
+            <h3>Your feedback</h3>
+            <span>Thank you for the feedback on our prediction! You gave a score of </span><span th:text="${feedback.feedback}"></span><br/>
+        </div>
+    </div>
+
+</body>
+
+</html>
