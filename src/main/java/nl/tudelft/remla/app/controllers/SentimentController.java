@@ -54,18 +54,19 @@ public class SentimentController {
 		return "feedbackpage";
 	}
 
+	/**
+	 * Metrics endpoint that will be used by Prometheus.
+	 * @return plain text with definitions of the metrics for Prometheus
+	 */
 
 	@GetMapping(value = "/metrics", produces = MediaType.TEXT_PLAIN_VALUE)
-	public ResponseEntity<String> showMetric(Model model) {
+	public ResponseEntity<String> showMetric() {
 		var httpHeaders = new HttpHeaders();
 		httpHeaders.setContentType(new MediaType("text", "plain", StandardCharsets.UTF_8));
 
 		Random rand = new Random();
 		int random = rand.nextInt(25);
 		StringBuilder metrics = new StringBuilder();
-//		metrics.append("# HELP my_app_random This is just a random 'gauge' for illustration.\n");
-//		metrics.append("# TYPE my_app_random gauge\n");
-//		metrics.append("my_app_random ").append(random).append("\n\n");
 
 		metrics.append("# HELP remla23-team3:num_sentiment_total_requests The number of all requests that have been made.\n");
 		metrics.append("# TYPE remla23-team3:num_sentiment_total_requests counter\n");

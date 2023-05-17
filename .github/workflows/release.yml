@@ -1,5 +1,5 @@
 name: Release
-# only trigger on tags, `verify` has already been triggered by push to PR
+# Simple test release for testing prometheus
 on:
   push:
     branches: 'add-metric-endpoint'
