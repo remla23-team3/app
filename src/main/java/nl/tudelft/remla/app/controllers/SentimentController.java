@@ -30,8 +30,8 @@ public class SentimentController {
 	private String modelServiceUrl;
 
 	private Integer requestsCounter = 0;  // number of successfully made requests
-	private Integer requestsPositive = 0; // number of successfully made requests
-	private Integer requestsNegative = 0; // number of successfully made requests
+	private Integer requestsPositive = 0;  //number of successfully made positive requests
+	private Integer requestsNegative = 0;  // number of successfully made negative requests
 	private Integer sentimentFeedback = 0; // variable feedback value
 	private Integer negativeFeedback = 0; 	  // number of user negative feedback
 	private Integer positiveFeedback = 0;	  // number of user positive feedback
@@ -71,10 +71,19 @@ public class SentimentController {
 		metrics.append("# TYPE num_sentiment_total_requests counter\n");
 		metrics.append("num_sentiment_total_requests{method=\"post\",code=\"200\"} ").append(requestsCounter).append("\n\n");
 
-		metrics.append("# HELP num_sentiment_requests_per_type The number of positive sentiments that have been made.\n");
+		metrics.append("# HELP num_sentiment_requests_per_type The number of sentiments per type based on the model prediction.\n");
 		metrics.append("# TYPE num_sentiment_requests_per_type counter\n");
 		metrics.append("num_sentiment_requests_per_type{type=\"positive\"} ").append(requestsPositive).append("\n");
-		metrics.append("num_sentiment_requests_per_type{type=\"negative\"} ").append(requestsNegative).append("\n");
+		metrics.append("num_sentiment_requests_per_type{type=\"negative\"} ").append(requestsNegative).append("\n\n");
+
+		metrics.append("# HELP feedback_per_type The number of sentiments per type based on the feedback.\n");
+		metrics.append("# TYPE feedback_per_type counter\n");
+		metrics.append("feedback_per_type{type=\"positive\"} ").append(positiveFeedback).append("\n");
+		metrics.append("feedback_per_type{type=\"negative\"} ").append(negativeFeedback).append("\n\n");
+
+		metrics.append("# HELP accuracy The accuracy based on the feedback.\n");
+		metrics.append("# TYPE accuracy gauge\n");
+		metrics.append("accuracy ").append((double) positiveFeedback/(double) requestsCounter).append("\n");
 
 		return new ResponseEntity<>(metrics.toString(), httpHeaders, HttpStatus.OK);
 	}
