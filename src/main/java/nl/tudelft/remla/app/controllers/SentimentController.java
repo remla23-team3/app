@@ -63,27 +63,27 @@ public class SentimentController {
 		Random rand = new Random();
 		int random = rand.nextInt(25);
 		StringBuilder metrics = new StringBuilder();
-		metrics.append("# HELP my_app_random This is just a random 'gauge' for illustration.\n");
-		metrics.append("# TYPE my_app_random gauge\n");
-		metrics.append("my_app_random ").append(random).append("\n\n");
+//		metrics.append("# HELP my_app_random This is just a random 'gauge' for illustration.\n");
+//		metrics.append("# TYPE my_app_random gauge\n");
+//		metrics.append("my_app_random ").append(random).append("\n\n");
 
-		metrics.append("# HELP num_sentiment_total_requests The number of all requests that have been made.\n");
-		metrics.append("# TYPE num_sentiment_total_requests counter\n");
-		metrics.append("num_sentiment_total_requests{method=\"post\",code=\"200\"} ").append(requestsCounter).append("\n\n");
+		metrics.append("# HELP remla23-team3:num_sentiment_total_requests The number of all requests that have been made.\n");
+		metrics.append("# TYPE remla23-team3:num_sentiment_total_requests counter\n");
+		metrics.append("remla23-team3:num_sentiment_total_requests{method=\"post\",code=\"200\"} ").append(requestsCounter).append("\n\n");
 
-		metrics.append("# HELP num_sentiment_requests_per_type The number of sentiments per type based on the model prediction.\n");
-		metrics.append("# TYPE num_sentiment_requests_per_type counter\n");
-		metrics.append("num_sentiment_requests_per_type{type=\"positive\"} ").append(requestsPositive).append("\n");
-		metrics.append("num_sentiment_requests_per_type{type=\"negative\"} ").append(requestsNegative).append("\n\n");
+		metrics.append("# HELP remla23-team3:num_sentiment_requests_per_type The number of sentiments per type based on the model prediction.\n");
+		metrics.append("# TYPE remla23-team3:num_sentiment_requests_per_type counter\n");
+		metrics.append("remla23-team3:num_sentiment_requests_per_type{type=\"positive\"} ").append(requestsPositive).append("\n");
+		metrics.append("remla23-team3:num_sentiment_requests_per_type{type=\"negative\"} ").append(requestsNegative).append("\n\n");
 
-		metrics.append("# HELP feedback_per_type The number of sentiments per type based on the feedback.\n");
-		metrics.append("# TYPE feedback_per_type counter\n");
-		metrics.append("feedback_per_type{type=\"positive\"} ").append(positiveFeedback).append("\n");
-		metrics.append("feedback_per_type{type=\"negative\"} ").append(negativeFeedback).append("\n\n");
+		metrics.append("# HELP remla23-team3:feedback_per_type The number of sentiments per type based on the feedback.\n");
+		metrics.append("# TYPE remla23-team3:feedback_per_type counter\n");
+		metrics.append("remla23-team3:feedback_per_type{type=\"positive\"} ").append(positiveFeedback).append("\n");
+		metrics.append("remla23-team3:feedback_per_type{type=\"negative\"} ").append(negativeFeedback).append("\n\n");
 
 		metrics.append("# HELP accuracy The accuracy based on the feedback.\n");
 		metrics.append("# TYPE accuracy gauge\n");
-		metrics.append("accuracy ").append((double) positiveFeedback/(double) requestsCounter).append("\n");
+		metrics.append("remla23-team3:accuracy ").append((double) positiveFeedback/(double) requestsCounter).append("\n");
 
 		return new ResponseEntity<>(metrics.toString(), httpHeaders, HttpStatus.OK);
 	}
