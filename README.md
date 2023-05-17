@@ -9,7 +9,7 @@ docker build -t <image_name> .
 2. Run the docker image
 
 ```bash
-docker run --network <bridged_network_name> --rm --name app -p 8080:8081 <image_name>
+docker run --rm --network <bridged_network_name> --name app -p 8080:8081 <image_name>
 ```
 This command assumes you have a bridged network created by the `docker network` command. All containers should run on the same network.
 
