@@ -140,6 +140,11 @@ public class SentimentController {
 		return "feedbackpage";
 	}
 
+	@GetMapping("/rate-limit-test")
+	public String rateLimitTest(Model model) {
+		return "rate-limit-test";
+	}
+
 	/**
 	 * This method sends the review to the model-service, and returns a double indicating the
 	 * sentiment of the review.
