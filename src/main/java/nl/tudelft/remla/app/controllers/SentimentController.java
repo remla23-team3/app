@@ -58,7 +58,6 @@ public class SentimentController {
 	 * Metrics endpoint that will be used by Prometheus.
 	 * @return plain text with definitions of the metrics for Prometheus
 	 */
-
 	@GetMapping(value = "/metrics", produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> showMetric() {
 		var httpHeaders = new HttpHeaders();
@@ -81,6 +80,7 @@ public class SentimentController {
 		metrics.append("# TYPE remla23_team3:feedback_per_type counter\n");
 		metrics.append("remla23_team3:feedback_per_type{type=\"positive\"} ").append(positiveFeedback).append("\n");
 		metrics.append("remla23_team3:feedback_per_type{type=\"negative\"} ").append(negativeFeedback).append("\n\n");
+//		metrics.append("remla23_team3:feedback_per_type{type=\"all\"} ").append(positiveFeedback).append("\n\n");
 
 		metrics.append("# HELP accuracy The accuracy based on the feedback.\n");
 		metrics.append("# TYPE accuracy gauge\n");
@@ -110,7 +110,7 @@ public class SentimentController {
 			requestsPositive++;
 		}
 
-		return "index";
+		return "result";
 	}
 
 	@PostMapping("/feedback")
