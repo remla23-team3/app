@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import nl.tudelft.remla.app.models.FeedbackRequest;
 import nl.tudelft.remla.app.models.SentimentRequest;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -32,7 +31,6 @@ public class SentimentController {
 	private Integer requestsCounter = 0;  // number of successfully made requests
 	private Integer requestsPositive = 0;  //number of successfully made positive requests
 	private Integer requestsNegative = 0;  // number of successfully made negative requests
-	private Integer sentimentFeedback = 0; // variable feedback value
 	private Integer negativeFeedback = 0; 	  // number of user negative feedback
 	private Integer positiveFeedback = 0;	  // number of user positive feedback
 
@@ -48,7 +46,7 @@ public class SentimentController {
 	@GetMapping("/give-feedback")
 	public String showResult(Model model) {
 		FeedbackRequest feedbackRequest = new FeedbackRequest();
-		feedbackRequest.setFeedback(-1);
+		feedbackRequest.setFeedback(null);
 		model.addAttribute("feedback", feedbackRequest);
 		
 		return "feedbackpage";
@@ -64,8 +62,6 @@ public class SentimentController {
 		var httpHeaders = new HttpHeaders();
 		httpHeaders.setContentType(new MediaType("text", "plain", StandardCharsets.UTF_8));
 
-		Random rand = new Random();
-		int random = rand.nextInt(25);
 		StringBuilder metrics = new StringBuilder();
 
 		metrics.append("# HELP remla23_team3:num_sentiment_total_requests The number of all requests that have been made.\n");
@@ -114,26 +110,22 @@ public class SentimentController {
 	}
 
 	@PostMapping("/feedback")
-	public String submitFeedback(@ModelAttribute("feedback") FeedbackRequest sentReq) throws IOException {
-		double feedback = sentReq.getFeedback();
+	public String submitFeedback(@ModelAttribute("feedback") FeedbackRequest sentReq) {
+		String feedback = sentReq.getFeedback();
 		requestsCounter++;
 
-		if (feedback < 50) {
+		if (feedback.equals("bad")) {
 			// The user gives negative feedback when the prediction is bad
 			// Do not overwrite it with sentReq.setFeedback()
-			this.sentimentFeedback = sentReq.getFeedback();
 			this.negativeFeedback++;
 
-			System.out.println("Sentiment prediction feedback: " + this.sentimentFeedback);
 			System.out.println("Total # negative prediction feedback: " + this.negativeFeedback);
 
 		} else {
 			// The user gives positive feedback when the prediction is good
 			// Do not overwrite it with sentReq.setFeedback()
-			this.sentimentFeedback = sentReq.getFeedback();
 			this.positiveFeedback++;
 
-			System.out.println("Sentiment prediction feedback: " + this.sentimentFeedback);
 			System.out.println("Total # positive prediction feedback: " + this.positiveFeedback);
 		}
 
