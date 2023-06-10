@@ -33,6 +33,8 @@ public class SentimentController {
 	private Integer requestsNegative = 0;  // number of successfully made negative requests
 	private Integer negativeFeedback = 0; 	  // number of user negative feedback
 	private Integer positiveFeedback = 0;	  // number of user positive feedback
+	private Integer submittedReviews = 0;
+	private Integer submittedFeedback = 0;
 
 	@GetMapping("/")
 	public String showForm(Model model) {
@@ -80,7 +82,11 @@ public class SentimentController {
 
 		metrics.append("# HELP accuracy The accuracy based on the feedback.\n");
 		metrics.append("# TYPE accuracy gauge\n");
-		metrics.append("remla23_team3:accuracy ").append((double) positiveFeedback/(double) requestsCounter).append("\n");
+		metrics.append("remla23_team3:accuracy ").append((double) positiveFeedback/(double) requestsCounter).append("\n\n");
+
+		metrics.append("# HELP remla23_team3:feedback_percentage How many people that submitted a review also submitted feedback.\n");
+		metrics.append("# TYPE feedback percentage\n");
+		metrics.append("remla23_team3:feedback_percentage ").append((double) submittedFeedback / (double) Math.max(1, submittedReviews)).append("\n\n");
 
 		return new ResponseEntity<>(metrics.toString(), httpHeaders, HttpStatus.OK);
 	}
@@ -89,7 +95,7 @@ public class SentimentController {
 	public String submitSentimentForm(@ModelAttribute("sentiment") SentimentRequest sentReq) throws IOException {
 		double sentiment = sendSentimentRequest(sentReq);
 		requestsCounter++;
-
+		submittedReviews++;
 		if (sentiment < 0.5) {
 			// Do something with the negative sentiment
 
@@ -113,7 +119,7 @@ public class SentimentController {
 	public String submitFeedback(@ModelAttribute("feedback") FeedbackRequest sentReq) {
 		String feedback = sentReq.getFeedback();
 		requestsCounter++;
-
+		submittedFeedback++;
 		if (feedback.equals("bad")) {
 			// The user gives negative feedback when the prediction is bad
 			// Do not overwrite it with sentReq.setFeedback()
