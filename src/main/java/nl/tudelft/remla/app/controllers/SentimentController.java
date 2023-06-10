@@ -82,7 +82,7 @@ public class SentimentController {
 
 		metrics.append("# HELP accuracy The accuracy based on the feedback.\n");
 		metrics.append("# TYPE accuracy gauge\n");
-		metrics.append("remla23_team3:accuracy ").append((double) positiveFeedback/(double) requestsCounter).append("\n\n");
+		metrics.append("remla23_team3:accuracy ").append((double) positiveFeedback/ (double) Math.max(1, requestsCounter)).append("\n\n");
 
 		metrics.append("# HELP remla23_team3:feedback_percentage How many people that submitted a review also submitted feedback.\n");
 		metrics.append("# TYPE feedback percentage\n");
