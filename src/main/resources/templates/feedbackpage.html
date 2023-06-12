@@ -10,18 +10,20 @@
 
     <div align="center">
         <h1>Sentiment feedback</h1>
-        <span>Provide a score between 1 and 100 to the resulted sentiment: </span>
+        <span>Was the predicted sentiment of your review good? </span>
         <form action="#" th:action="@{/feedback}" th:object="${feedback}" method="post">
-            <label>Sentiment score:</label>
-            <input type="text" th:field="*{feedback}" placeholder="Feedback">
-            <button type="submit">Submit feedback</button>
+            <label>The prediction was:</label>
+            <div>
+                <button type="submit" name="feedback" value="Good">Good</button>
+                <button type="submit" name="feedback" value="Bad">Bad</button>
+            </div>
         </form>
     </div>
 
-    <div align="center" th:if="${feedback.feedback != -1}">
+    <div align="center" th:if="${feedback.feedback != null}">
         <div align="center">
             <h3>Your feedback</h3>
-            <span>Thank you for the feedback on our prediction! You gave a score of </span><span th:text="${feedback.feedback}"></span><br/>
+            <span>Thank you for the feedback on our prediction! You submitted that the feedback was </span><span th:text="${feedback.feedback}"></span><br/>
         </div>
     </div>
 
