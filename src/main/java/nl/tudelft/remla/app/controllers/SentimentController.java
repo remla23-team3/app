@@ -89,7 +89,7 @@ public class SentimentController {
 		metrics.append("remla23_team3:accuracy ").append((double) correctPredictions/ (double) Math.max(1, requestsCounter)).append("\n\n");
 
 		metrics.append("# HELP remla23_team3:feedback_percentage How many people that submitted a review also submitted feedback.\n");
-		metrics.append("# TYPE feedback percentage\n");
+		metrics.append("# TYPE feedback_percentage\n");
 		metrics.append("remla23_team3:feedback_percentage ").append((double) submittedFeedback / (double) Math.max(1, submittedReviews)).append("\n\n");
 
 		metrics.append("# HELP http_request_duration_seconds A histogram of the request duration.\n");
