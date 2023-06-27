@@ -29,12 +29,16 @@ public class SentimentController {
 	private String modelServiceUrl;
 
 	private Integer requestsCounter = 0;  // number of successfully made requests
-	private Integer requestsPositive = 0;  //number of successfully made positive requests
-	private Integer requestsNegative = 0;  // number of successfully made negative requests
-	private Integer negativeFeedback = 0; 	  // number of user negative feedback
-	private Integer positiveFeedback = 0;	  // number of user positive feedback
+	private Integer requestsPositive = 0;  //number of successfully made positive requests according to the model
+	private Integer requestsNegative = 0;  // number of successfully made negative requests according to the model
+
+	private Integer correctPredictions = 0;   // number of correct predictions
+
+	private Integer wrongPredictions = 0;	  // number of wrong predictions
 	private Integer submittedReviews = 0;
 	private Integer submittedFeedback = 0;
+
+	private int[] feedbackScores = new int[5];
 
 	@GetMapping("/")
 	public String showForm(Model model) {
@@ -75,18 +79,38 @@ public class SentimentController {
 		metrics.append("remla23_team3:num_sentiment_requests_per_type{type=\"positive\"} ").append(requestsPositive).append("\n");
 		metrics.append("remla23_team3:num_sentiment_requests_per_type{type=\"negative\"} ").append(requestsNegative).append("\n\n");
 
-		metrics.append("# HELP remla23_team3:feedback_per_type The number of sentiments per type based on the feedback.\n");
+		metrics.append("# HELP remla23_team3:feedback_per_type The number of correct and wrong sentiments based on the user.\n");
 		metrics.append("# TYPE remla23_team3:feedback_per_type counter\n");
-		metrics.append("remla23_team3:feedback_per_type{type=\"positive\"} ").append(positiveFeedback).append("\n");
-		metrics.append("remla23_team3:feedback_per_type{type=\"negative\"} ").append(negativeFeedback).append("\n\n");
+		metrics.append("remla23_team3:feedback_per_type{type=\"correct\"} ").append(correctPredictions).append("\n");
+		metrics.append("remla23_team3:feedback_per_type{type=\"wrong\"} ").append(wrongPredictions).append("\n\n");
 
 		metrics.append("# HELP accuracy The accuracy based on the feedback.\n");
 		metrics.append("# TYPE accuracy gauge\n");
-		metrics.append("remla23_team3:accuracy ").append((double) positiveFeedback/ (double) Math.max(1, requestsCounter)).append("\n\n");
+		metrics.append("remla23_team3:accuracy ").append((double) correctPredictions/ (double) Math.max(1, requestsCounter)).append("\n\n");
 
 		metrics.append("# HELP remla23_team3:feedback_percentage How many people that submitted a review also submitted feedback.\n");
 		metrics.append("# TYPE feedback percentage\n");
 		metrics.append("remla23_team3:feedback_percentage ").append((double) submittedFeedback / (double) Math.max(1, submittedReviews)).append("\n\n");
+
+		metrics.append("# HELP http_request_duration_seconds A histogram of the request duration.\n");
+		metrics.append("# TYPE http_request_duration_seconds histogram.\n");
+		metrics.append("remla23_team3:http_request_duration_seconds_bucket{le=\"0.05\"} ").append(24054).append("\n");
+		metrics.append("remla23_team3:http_request_duration_seconds_bucket{le=\"0.1\"} ").append(33444).append("\n");
+		metrics.append("remla23_team3:http_request_duration_seconds_bucket{le=\"0.2\"} ").append(100392).append("\n");
+		metrics.append("remla23_team3:http_request_duration_seconds_bucket{le=\"0.5\"} ").append(129389).append("\n");
+		metrics.append("remla23_team3:http_request_duration_seconds_bucket{le=\"+Inf\"} ").append(144320).append("\n");
+		metrics.append("remla23_team3:http_request_duration_seconds_sum ").append(53423).append("\n");
+		metrics.append("remla23_team3:http_request_duration_seconds_count ").append(144320).append("\n\n");
+
+		metrics.append("# HELP rpc_duration_seconds A summary of the RPC duration in seconds.\n");
+		metrics.append("# TYPE rpc_duration_seconds summary\n");
+		metrics.append("remla23_team3:rpc_duration_seconds{quantile=\"0.01\"} ").append(3102).append("\n");
+		metrics.append("remla23_team3:rpc_duration_seconds{quantile=\"0.05\"} ").append(3272).append("\n");
+		metrics.append("remla23_team3:rpc_duration_seconds{quantile=\"0.5\"} ").append(4773).append("\n");
+		metrics.append("remla23_team3:rpc_duration_seconds{quantile=\"0.9\"} ").append(9001).append("\n");
+		metrics.append("remla23_team3:rpc_duration_seconds{quantile=\"0.99\"} ").append( 76656).append("\n");
+		metrics.append("remla23_team3:rpc_duration_seconds_sum ").append(17560473).append("\n");
+		metrics.append("remla23_team3:rpc_duration_seconds_count ").append(2693).append("\n\n");
 
 		return new ResponseEntity<>(metrics.toString(), httpHeaders, HttpStatus.OK);
 	}
@@ -118,21 +142,41 @@ public class SentimentController {
 	@PostMapping("/feedback")
 	public String submitFeedback(@ModelAttribute("feedback") FeedbackRequest sentReq) {
 		String feedback = sentReq.getFeedback();
+		String[] resultsFeedback = feedback.split(",");
 		requestsCounter++;
 		submittedFeedback++;
-		if (feedback.equals("wrong")) {
+		if (resultsFeedback[0].equals("Wrong")) {
 			// The user gives negative feedback when the prediction is bad
 			// Do not overwrite it with sentReq.setFeedback()
-			this.negativeFeedback++;
+			this.wrongPredictions++;
 
-			System.out.println("Total # negative prediction feedback: " + this.negativeFeedback);
+			System.out.println("Total # negative prediction feedback: " + this.wrongPredictions);
 
 		} else {
 			// The user gives positive feedback when the prediction is good
 			// Do not overwrite it with sentReq.setFeedback()
-			this.positiveFeedback++;
+			this.correctPredictions++;
 
-			System.out.println("Total # positive prediction feedback: " + this.positiveFeedback);
+			System.out.println("Total # positive prediction feedback: " + this.correctPredictions);
+		}
+		try {
+			int score = Integer.parseInt(resultsFeedback[1]);
+			if(score < 3) {
+				feedbackScores[0]++;
+			}
+			if (score < 6) {
+				feedbackScores[1]++;
+			}
+			if (score < 9) {
+				feedbackScores[2]++;
+			}
+			if (score <= 10) {
+				feedbackScores[3]++;
+			} else {
+				feedbackScores[4]++;
+			}
+		}  catch (NumberFormatException exception){
+			System.out.println("Incorrect feedback format - Feedback is ignored");
 		}
 
 		return "result-feedback";
