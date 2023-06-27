@@ -93,7 +93,7 @@ public class SentimentController {
 
 	@PostMapping("/sentiment")
 	public String submitSentimentForm(@ModelAttribute("sentiment") SentimentRequest sentReq) throws IOException {
-		double sentiment = sendSentimentRequest(sentReq);
+		double sentiment = 0.0; //sendSentimentRequest(sentReq);
 		requestsCounter++;
 		submittedReviews++;
 		if (sentiment < 0.5) {
@@ -112,7 +112,7 @@ public class SentimentController {
 			requestsPositive++;
 		}
 
-		return "index";
+		return "result";
 	}
 
 	@PostMapping("/feedback")
@@ -120,7 +120,7 @@ public class SentimentController {
 		String feedback = sentReq.getFeedback();
 		requestsCounter++;
 		submittedFeedback++;
-		if (feedback.equals("bad")) {
+		if (feedback.equals("wrong")) {
 			// The user gives negative feedback when the prediction is bad
 			// Do not overwrite it with sentReq.setFeedback()
 			this.negativeFeedback++;
@@ -135,7 +135,7 @@ public class SentimentController {
 			System.out.println("Total # positive prediction feedback: " + this.positiveFeedback);
 		}
 
-		return "feedbackpage";
+		return "result-feedback";
 	}
 
 	/**
