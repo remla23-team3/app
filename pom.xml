@@ -8,6 +8,14 @@
     <artifactId>app</artifactId>
     <version>0.0.1</version>
 
+    <!--JitPack repository will search for the requested artifact on GitHub packages and enables using it as dependency.-->
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
+
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
@@ -46,6 +54,12 @@
     </build>
 
     <dependencies>
+        <dependency>
+            <groupId>com.github.remla23-team3</groupId>
+            <artifactId>lib</artifactId>
+            <version>v0.0.13</version>
+        </dependency>
+
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
             <artifactId>httpclient5</artifactId>
