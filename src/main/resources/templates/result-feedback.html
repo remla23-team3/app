@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="ISO-8859-1">
+    <title>Review</title>
+    <style>
+    .go-back-button {
+      margin: 10px 20px; /* Adjust the values as per your needs */
+    }
+  </style>
+</head>
+
+<body>
+
+<div align="center" th:if="${feedback.feedback != null}">
+        <div align="center">
+            <h3>Your feedback</h3>
+            <span>Thank you for the feedback! You submitted - </span><span th:text="${feedback.feedback}"></span><br/>
+        </div>
+    </div>
+
+<div align="center">
+    <a th:href="@{/}">
+        <button type="button" class="go-back-button">Go back</button>
+    </a>
+</div>

@@ -4,27 +4,38 @@
 <head>
     <meta charset="ISO-8859-1">
     <title>Feedback</title>
+    <style>
+    .go-back-button {
+      margin: 10px 20px;
+    }
+    .margined-div {
+      margin: 20px;
+    }
+  </style>
 </head>
 
 <body>
 
     <div align="center">
         <h1>Sentiment feedback</h1>
-        <span>Was the predicted sentiment of your review good? </span>
+        <span>Was the predicted sentiment of your review correct? </span>
         <form action="#" th:action="@{/feedback}" th:object="${feedback}" method="post">
             <label>The prediction was:</label>
             <div>
-                <button type="submit" name="feedback" value="Good">Good</button>
-                <button type="submit" name="feedback" value="Bad">Bad</button>
+
+                <input type="radio" id="correct" name="feedback" value="Correct">
+                <label for="correct">Correct</label>
+                <input type="radio" id="wrong" name="feedback" value="Wrong">
+                <label for="wrong">Wrong</label><br>
+            </div>
+
+            <div class="margined-div">
+                <span>Could you rate your experience on the website from 0 to 10 (0 - really bad and 10 - perfect)? </span><br>
+                <label>Score:</label>
+                <input type="text" th:field="*{feedback}" placeholder="Feedback">
+                <button type="submit">Submit feedback</button>
             </div>
         </form>
-    </div>
-
-    <div align="center" th:if="${feedback.feedback != null}">
-        <div align="center">
-            <h3>Your feedback</h3>
-            <span>Thank you for the feedback on our prediction! You submitted that the feedback was </span><span th:text="${feedback.feedback}"></span><br/>
-        </div>
     </div>
 
 </body>
