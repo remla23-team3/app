@@ -4,6 +4,16 @@
 <head>
     <meta charset="ISO-8859-1">
     <title>Review</title>
+    <style>
+        .big-red-button {
+            background-color: red;
+            color: white;
+            font-size: 20px;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
 </head>
 
 <body>
@@ -13,7 +23,7 @@
         <form action="#" th:action="@{/sentiment}" th:object="${sentiment}" method="post">
             <label>Sentiment:</label>
             <input type="text" th:field="*{sentiment}" placeholder="Sentiment">
-            <button type="submit">Submit</button>
+            <button type="submit" class="big-red-button">Submit</button>
         </form>
     </div>
 
