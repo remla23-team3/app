@@ -29,12 +29,17 @@ public class SentimentController {
 	private String modelServiceUrl;
 
 	private Integer requestsCounter = 0;  // number of successfully made requests
-	private Integer requestsPositive = 0;  //number of successfully made positive requests
-	private Integer requestsNegative = 0;  // number of successfully made negative requests
-	private Integer negativeFeedback = 0; 	  // number of user negative feedback
-	private Integer positiveFeedback = 0;	  // number of user positive feedback
+	private Integer requestsPositive = 0;  //number of successfully made positive requests according to the model
+	private Integer requestsNegative = 0;  // number of successfully made negative requests according to the model
+
+	private Integer correctPredictions = 0;   // number of correct predictions
+
+	private Integer wrongPredictions = 0;	  // number of wrong predictions
 	private Integer submittedReviews = 0;
 	private Integer submittedFeedback = 0;
+
+	private int[] feedbackScores = new int[5];
+	private int feedbackScoresSum = 0;
 
 	@GetMapping("/")
 	public String showForm(Model model) {
@@ -66,27 +71,47 @@ public class SentimentController {
 
 		StringBuilder metrics = new StringBuilder();
 
-		metrics.append("# HELP remla23_team3:num_sentiment_total_requests The number of all requests that have been made.\n");
-		metrics.append("# TYPE remla23_team3:num_sentiment_total_requests counter\n");
-		metrics.append("remla23_team3:num_sentiment_total_requests{method=\"post\",code=\"200\"} ").append(requestsCounter).append("\n\n");
+		metrics.append("# HELP remla23_team3:num_total_requests The number of all requests that have been made.\n");
+		metrics.append("# TYPE remla23_team3:num_total_requests counter\n");
+		metrics.append("remla23_team3:num_total_requests{method=\"post\",code=\"200\"} ").append(requestsCounter).append("\n\n");
 
-		metrics.append("# HELP remla23_team3:num_sentiment_requests_per_type The number of sentiments per type based on the model prediction.\n");
-		metrics.append("# TYPE remla23_team3:num_sentiment_requests_per_type counter\n");
-		metrics.append("remla23_team3:num_sentiment_requests_per_type{type=\"positive\"} ").append(requestsPositive).append("\n");
-		metrics.append("remla23_team3:num_sentiment_requests_per_type{type=\"negative\"} ").append(requestsNegative).append("\n\n");
+		metrics.append("# HELP remla23_team3:num_requests_per_type The number of requests per type based on the model prediction.\n");
+		metrics.append("# TYPE remla23_team3:num_requests_per_type counter\n");
+		metrics.append("remla23_team3:num_requests_per_type{type=\"positive\"} ").append(requestsPositive).append("\n");
+		metrics.append("remla23_team3:num_requests_per_type{type=\"negative\"} ").append(requestsNegative).append("\n\n");
 
-		metrics.append("# HELP remla23_team3:feedback_per_type The number of sentiments per type based on the feedback.\n");
-		metrics.append("# TYPE remla23_team3:feedback_per_type counter\n");
-		metrics.append("remla23_team3:feedback_per_type{type=\"positive\"} ").append(positiveFeedback).append("\n");
-		metrics.append("remla23_team3:feedback_per_type{type=\"negative\"} ").append(negativeFeedback).append("\n\n");
+		metrics.append("# HELP remla23_team3:predictions The number of correct and wrong predictions based on the user.\n");
+		metrics.append("# TYPE remla23_team3:predictions counter\n");
+		metrics.append("remla23_team3:predictions{type=\"correct\"} ").append(correctPredictions).append("\n");
+		metrics.append("remla23_team3:predictions{type=\"wrong\"} ").append(wrongPredictions).append("\n\n");
 
 		metrics.append("# HELP accuracy The accuracy based on the feedback.\n");
 		metrics.append("# TYPE accuracy gauge\n");
-		metrics.append("remla23_team3:accuracy ").append((double) positiveFeedback/ (double) Math.max(1, requestsCounter)).append("\n\n");
+		metrics.append("remla23_team3:accuracy ").append((double) correctPredictions/ (double) Math.max(1, requestsCounter)).append("\n\n");
 
 		metrics.append("# HELP remla23_team3:feedback_percentage How many people that submitted a review also submitted feedback.\n");
-		metrics.append("# TYPE feedback percentage\n");
+		metrics.append("# TYPE feedback_percentage gauge\n");
 		metrics.append("remla23_team3:feedback_percentage ").append((double) submittedFeedback / (double) Math.max(1, submittedReviews)).append("\n\n");
+
+		metrics.append("# HELP hist_feedback_scores A histogram for the feedback scores.\n");
+		metrics.append("# TYPE feedback_scores histogram\n");
+		metrics.append("remla23_team3:hist_feedback_scores_bucket{le=\"2\"} ").append(feedbackScores[0]).append("\n");
+		metrics.append("remla23_team3:hist_feedback_scores_bucket{le=\"5\"} ").append(feedbackScores[1]).append("\n");
+		metrics.append("remla23_team3:hist_feedback_scores_bucket{le=\"8\"} ").append(feedbackScores[2]).append("\n");
+		metrics.append("remla23_team3:hist_feedback_scores_bucket{le=\"10\"} ").append(feedbackScores[3]).append("\n");
+		metrics.append("remla23_team3:hist_feedback_scores_bucket{le=\"+Inf\"} ").append(feedbackScores[4]).append("\n");
+		metrics.append("remla23_team3:hist_feedback_scores_sum ").append(feedbackScoresSum).append("\n");
+		metrics.append("remla23_team3:hist_feedback_scores_count ").append(feedbackScores[4]).append("\n\n");
+
+		metrics.append("# HELP sum_feedback_scores A summary for the feedback scores.\n");
+		metrics.append("# TYPE sum_feedback_scores summary\n");
+		metrics.append("remla23_team3:sum_feedback_scores{quantile=\"0.01\"} ").append(feedbackScores[0]).append("\n");
+		metrics.append("remla23_team3:sum_feedback_scores{quantile=\"0.05\"} ").append(feedbackScores[1]).append("\n");
+		metrics.append("remla23_team3:sum_feedback_scores{quantile=\"0.5\"} ").append(feedbackScores[2]).append("\n");
+		metrics.append("remla23_team3:sum_feedback_scores{quantile=\"0.9\"} ").append(feedbackScores[3]).append("\n");
+		metrics.append("remla23_team3:sum_feedback_scores{quantile=\"0.99\"} ").append(feedbackScores[4]).append("\n");
+		metrics.append("remla23_team3:sum_feedback_scores_sum ").append(feedbackScoresSum).append("\n");
+		metrics.append("remla23_team3:sum_feedback_scores_count ").append(feedbackScores[4]).append("\n\n");
 
 		return new ResponseEntity<>(metrics.toString(), httpHeaders, HttpStatus.OK);
 	}
@@ -112,30 +137,51 @@ public class SentimentController {
 			requestsPositive++;
 		}
 
-		return "index";
+		return "result";
 	}
 
 	@PostMapping("/feedback")
 	public String submitFeedback(@ModelAttribute("feedback") FeedbackRequest sentReq) {
 		String feedback = sentReq.getFeedback();
+		String[] resultsFeedback = feedback.split(",");
 		requestsCounter++;
 		submittedFeedback++;
-		if (feedback.equals("bad")) {
+		if (resultsFeedback[0].equals("Wrong")) {
 			// The user gives negative feedback when the prediction is bad
 			// Do not overwrite it with sentReq.setFeedback()
-			this.negativeFeedback++;
+			this.wrongPredictions++;
 
-			System.out.println("Total # negative prediction feedback: " + this.negativeFeedback);
+			System.out.println("Total # negative prediction feedback: " + this.wrongPredictions);
 
 		} else {
 			// The user gives positive feedback when the prediction is good
 			// Do not overwrite it with sentReq.setFeedback()
-			this.positiveFeedback++;
+			this.correctPredictions++;
 
-			System.out.println("Total # positive prediction feedback: " + this.positiveFeedback);
+			System.out.println("Total # positive prediction feedback: " + this.correctPredictions);
+		}
+		try {
+			int score = Integer.parseInt(resultsFeedback[1]);
+			if(score < 3) {
+				feedbackScores[0]++;
+			}
+			if (score < 6) {
+				feedbackScores[1]++;
+			}
+			if (score < 9) {
+				feedbackScores[2]++;
+			}
+			if (score <= 10) {
+				feedbackScores[3]++;
+			} else {
+				feedbackScores[4]++;
+			}
+			feedbackScoresSum += score;
+		}  catch (NumberFormatException exception){
+			System.out.println("Incorrect feedback format - Feedback is ignored");
 		}
 
-		return "feedbackpage";
+		return "result-feedback";
 	}
 
 	/**

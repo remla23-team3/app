@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="ISO-8859-1">
+    <title>Review</title>
+    <style>
+    .go-back-button {
+      margin: 10px 20px; /* Adjust the values as per your needs */
+    }
+    .big-red-button {
+        background-color: red;
+        color: white;
+        font-size: 20px;
+        padding: 10px 20px;
+        border: none;
+        cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+<div align="center" th:if="${sentiment.sentiment != null}">
+    <h3>Result</h3>
+    <span>Sentiment is </span><span th:text="${sentiment.review}"></span><br/>
+    <h3>Give us some feedback on the prediction right here</h3>
+    <a th:href="@{/give-feedback}">
+        <button type="button" class="big-red-button">Give feedback</button>
+    </a>
+</div>
+
+<div align="center">
+    <a th:href="@{/}">
+        <button type="button" class="go-back-button">Go back</button>
+    </a>
+</div>
+
+</body>
