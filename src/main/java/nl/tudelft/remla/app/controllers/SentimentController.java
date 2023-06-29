@@ -105,13 +105,13 @@ public class SentimentController {
 
 		metrics.append("# HELP sum_feedback_scores A summary for the feedback scores.\n");
 		metrics.append("# TYPE sum_feedback_scores summary\n");
-		metrics.append("remla23_team3:sum_feedback_scores{quantile=\"0.01\"} ").append(3102).append("\n");
-		metrics.append("remla23_team3:sum_feedback_scores{quantile=\"0.05\"} ").append(3272).append("\n");
-		metrics.append("remla23_team3:sum_feedback_scores{quantile=\"0.5\"} ").append(4773).append("\n");
-		metrics.append("remla23_team3:sum_feedback_scores{quantile=\"0.9\"} ").append(9001).append("\n");
-		metrics.append("remla23_team3:sum_feedback_scores{quantile=\"0.99\"} ").append( 76656).append("\n");
-		metrics.append("remla23_team3:sum_feedback_scores_sum ").append(17560473).append("\n");
-		metrics.append("remla23_team3:sum_feedback_scores_count ").append(2693).append("\n\n");
+		metrics.append("remla23_team3:sum_feedback_scores{quantile=\"0.01\"} ").append(feedbackScores[0]).append("\n");
+		metrics.append("remla23_team3:sum_feedback_scores{quantile=\"0.05\"} ").append(feedbackScores[1]).append("\n");
+		metrics.append("remla23_team3:sum_feedback_scores{quantile=\"0.5\"} ").append(feedbackScores[2]).append("\n");
+		metrics.append("remla23_team3:sum_feedback_scores{quantile=\"0.9\"} ").append(feedbackScores[3]).append("\n");
+		metrics.append("remla23_team3:sum_feedback_scores{quantile=\"0.99\"} ").append(feedbackScores[4]).append("\n");
+		metrics.append("remla23_team3:sum_feedback_scores_sum ").append(feedbackScoresSum).append("\n");
+		metrics.append("remla23_team3:sum_feedback_scores_count ").append(feedbackScores[4]).append("\n\n");
 
 		return new ResponseEntity<>(metrics.toString(), httpHeaders, HttpStatus.OK);
 	}
